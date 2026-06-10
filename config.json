@@ -1,0 +1,10 @@
+{
+    "deepseek_api_key": "",
+    "deepseek_model": "deepseek-chat",
+    "deepseek_base_url": "https://api.deepseek.com/v1/chat/completions",
+    "admin_password": "admin",
+    "redis_url": "localhost:6379",
+    "redis_password": "",
+    "port": "8080",
+    "summary_threshold": 8
+}

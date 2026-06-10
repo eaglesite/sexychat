@@ -1,0 +1,12 @@
+{
+  "name": "simple-chat",
+  "version": "1.0.0",
+  "description": "A simple chat application",
+  "scripts": {
+    "start": "npx http-server -p 3000 -o",
+    "dev": "npx http-server -p 3000 -o"
+  },
+  "keywords": ["chat", "simple", "demo"],
+  "author": "",
+  "license": "MIT"
+}

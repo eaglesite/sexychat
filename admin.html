@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 50%, #f48fb1 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1000px;
+            margin: 0 auto;
+            box-shadow: 0 10px 40px rgba(244, 143, 177, 0.3);
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .admin-header h1 {
+            color: #ec4899;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .admin-header p {
+            color: #9ca3af;
+            font-size: 14px;
+        }
+
+        .auth-section {
+            margin-bottom: 30px;
+        }
+
+        .auth-form {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .auth-form input {
+            padding: 12px 20px;
+            border: 2px solid rgba(244, 143, 177, 0.3);
+            border-radius: 12px;
+            font-size: 16px;
+            width: 250px;
+            transition: all 0.3s ease;
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: #ec4899;
+            box-shadow: 0 0 10px rgba(236, 72, 153, 0.2);
+        }
+
+        .auth-form button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(236, 72, 153, 0.4);
+        }
+
+        .auth-error {
+            color: #ef4444;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        /* 标签页样式 */
+        .tabs {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        .tabs.show {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid rgba(244, 143, 177, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: rgba(244, 143, 177, 0.1);
+            border: none;
+            border-radius: 8px;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            background: rgba(244, 143, 177, 0.2);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+            color: white;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            color: #374151;
+            font-size: 20px;
+        }
+
+        .add-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        /* 角色列表 */
+        .roles-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .role-card {
+            background: white;
+            border: 2px solid rgba(244, 143, 177, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .role-card:hover {
+            border-color: #ec4899;
+            box-shadow: 0 5px 20px rgba(236, 72, 153, 0.2);
+        }
+
+        .role-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .role-card-header h3 {
+            color: #ec4899;
+            font-size: 18px;
+        }
+
+        .role-card-header .role-id {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        .role-card-body {
+            margin-bottom: 15px;
+        }
+
+        .role-card-body p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .role-card-body .system-prompt {
+            background: rgba(244, 143, 177, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            color: #374151;
+            font-size: 13px;
+        }
+
+        .role-card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .role-card-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            color: white;
+        }
+
+        .edit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.4);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            color: white;
+        }
+
+        .delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(239, 68, 68, 0.4);
+        }
+
+        /* 背景图片列表 */
+        .backgrounds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .bg-card {
+            background: white;
+            border: 2px solid rgba(244, 143, 177, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .bg-card:hover {
+            border-color: #ec4899;
+            box-shadow: 0 5px 20px rgba(236, 72, 153, 0.2);
+        }
+
+        .bg-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .bg-card-footer {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .bg-card-footer p {
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .bg-card-footer button {
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bg-card-footer button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(239, 68, 68, 0.4);
+        }
+
+        /* 文件上传 */
+        .upload-area {
+            border: 2px dashed rgba(244, 143, 177, 0.4);
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #ec4899;
+            background: rgba(244, 143, 177, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: #ec4899;
+            background: rgba(244, 143, 177, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #ec4899;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-progress {
+            margin-top: 15px;
+            display: none;
+        }
+
+        .upload-progress.show {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(244, 143, 177, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-inner {
+            height: 100%;
+            background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #ec4899;
+            font-size: 20px;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #374151;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid rgba(244, 143, 177, 0.3);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #ec4899;
+            box-shadow: 0 0 10px rgba(236, 72, 153, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-footer button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-btn {
+            background: rgba(156, 163, 175, 0.2);
+            color: #6b7280;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(156, 163, 175, 0.3);
+        }
+
+        .save-btn {
+            background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%);
+            color: white;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(236, 72, 153, 0.4);
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #ec4899;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            text-align: center;
+            color: #9ca3af;
+            padding: 20px;
+        }
+
+        .success-message {
+            color: #10b981;
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>✨ 系统管理</h1>
+            <p>管理聊天系统的角色和背景图片</p>
+        </div>
+
+        <div class="auth-section" id="authSection">
+            <div class="auth-form">
+                <input type="password" id="passwordInput" placeholder="输入管理密码">
+                <button onclick="authenticate()">验证</button>
+            </div>
+            <div class="auth-error" id="authError"></div>
+        </div>
+
+        <!-- 标签页 -->
+        <div class="tabs" id="tabs">
+            <button class="tab active" onclick="switchTab('roles')">角色管理</button>
+            <button class="tab" onclick="switchTab('backgrounds')">背景图片</button>
+            <button class="tab" onclick="switchTab('config')">系统配置</button>
+        </div>
+
+        <!-- 角色管理 -->
+        <div class="content-section" id="rolesSection">
+            <div class="section-header">
+                <h2>角色列表</h2>
+                <button class="add-btn" onclick="showAddRoleModal()">+ 添加角色</button>
+            </div>
+            <div class="roles-list" id="rolesList">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+
+        <!-- 背景图片管理 -->
+        <div class="content-section" id="backgroundsSection">
+            <div class="section-header">
+                <h2>背景图片</h2>
+            </div>
+            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                <input type="file" id="fileInput" accept="image/jpeg,image/png,image/gif" onchange="handleFileSelect(event)">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">点击或拖拽上传图片</div>
+                <div class="upload-progress" id="uploadProgress">
+                    <div class="progress-bar">
+                        <div class="progress-bar-inner" id="progressBar"></div>
+                    </div>
+                </div>
+                <div class="success-message" id="uploadSuccess"></div>
+            </div>
+            <div class="backgrounds-grid" id="backgroundsGrid">
+                <div class="loading">加载中...</div>
+            </div>
+        </div>
+
+        <!-- 系统配置 -->
+        <div class="content-section" id="configSection">
+            <div class="section-header">
+                <h2>DeepSeek 配置</h2>
+            </div>
+            <div class="config-form" style="background: white; border-radius: 15px; padding: 25px; border: 2px solid rgba(244, 143, 177, 0.2);">
+                <div class="form-group">
+                    <label>API 密钥</label>
+                    <input type="password" id="apiKeyInput" placeholder="留空则不修改">
+                </div>
+                <div class="form-group">
+                    <label>模型名称</label>
+                    <input type="text" id="modelInput" placeholder="如: deepseek-chat">
+                </div>
+                <div class="form-group">
+                    <label>Base URL</label>
+                    <input type="text" id="baseUrlInput" placeholder="如: https://api.deepseek.com/v1/chat/completions">
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="add-btn" onclick="loadConfig()">刷新</button>
+                    <button class="save-btn" onclick="saveSystemConfig()" style="padding: 10px 30px; border: none; border-radius: 10px; font-size: 14px; cursor: pointer; transition: all 0.3s ease;">保存配置</button>
+                </div>
+                <div class="success-message" id="configSuccess" style="margin-top: 10px;"></div>
+            </div>
+        </div>
+
+        <a href="/" class="back-link">← 返回聊天页面</a>
+    </div>
+
+    <!-- 添加/编辑角色模态框 -->
+    <div class="modal" id="roleModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">添加角色</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>角色ID</label>
+                    <input type="text" id="roleIdInput" placeholder="例如: developer">
+                </div>
+                <div class="form-group">
+                    <label>角色名称</label>
+                    <input type="text" id="roleNameInput" placeholder="例如: 编程助手">
+                </div>
+                <div class="form-group">
+                    <label>角色描述</label>
+                    <input type="text" id="roleDescInput" placeholder="例如: 精通多种编程语言的编程专家">
+                </div>
+                <div class="form-group">
+                    <label>系统提示词</label>
+                    <textarea id="rolePromptInput" placeholder="例如: 你是一位资深的编程专家..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn" onclick="hideRoleModal()">取消</button>
+                <button class="save-btn" onclick="saveRole()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let adminPassword = '';
+        let roles = [];
+        let backgrounds = [];
+        let editingRoleId = null;
+
+        async function authenticate() {
+            const password = document.getElementById('passwordInput').value;
+            if (!password) {
+                document.getElementById('authError').textContent = '请输入密码';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    adminPassword = password;
+                    document.getElementById('authSection').style.display = 'none';
+                    document.getElementById('tabs').classList.add('show');
+                    document.getElementById('rolesSection').classList.add('active');
+                    loadRoles();
+                    loadBackgrounds();
+                } else {
+                    document.getElementById('authError').textContent = data.error || '密码错误';
+                }
+            } catch (error) {
+                document.getElementById('authError').textContent = '验证失败，请检查服务器';
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Section').classList.add('active');
+
+            if (tabName === 'backgrounds' && backgrounds.length === 0) {
+                loadBackgrounds();
+            }
+            if (tabName === 'config') {
+                loadConfig();
+            }
+        }
+
+        // 角色管理
+        async function loadRoles() {
+            try {
+                const response = await fetch('/api/roles');
+                const data = await response.json();
+                roles = data.roles;
+                renderRoles();
+            } catch (error) {
+                document.getElementById('rolesList').innerHTML = '<div class="loading" style="color: #ef4444;">加载失败</div>';
+            }
+        }
+
+        function renderRoles() {
+            if (roles.length === 0) {
+                document.getElementById('rolesList').innerHTML = '<div class="loading">暂无角色</div>';
+                return;
+            }
+
+            document.getElementById('rolesList').innerHTML = roles.map(role => `
+                <div class="role-card">
+                    <div class="role-card-header">
+                        <h3>${role.name}</h3>
+                        <span class="role-id">ID: ${role.id}</span>
+                    </div>
+                    <div class="role-card-body">
+                        <p><strong>描述：</strong>${role.description}</p>
+                        <div class="system-prompt">${role.system_prompt}</div>
+                    </div>
+                    <div class="role-card-actions">
+                        <button class="edit-btn" onclick="editRole('${role.id}')">编辑</button>
+                        <button class="delete-btn" onclick="deleteRole('${role.id}')">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showAddRoleModal() {
+            editingRoleId = null;
+            document.getElementById('modalTitle').textContent = '添加角色';
+            document.getElementById('roleIdInput').value = '';
+            document.getElementById('roleIdInput').disabled = false;
+            document.getElementById('roleNameInput').value = '';
+            document.getElementById('roleDescInput').value = '';
+            document.getElementById('rolePromptInput').value = '';
+            document.getElementById('roleModal').classList.add('show');
+        }
+
+        function editRole(roleId) {
+            const role = roles.find(r => r.id === roleId);
+            if (!role) return;
+
+            editingRoleId = roleId;
+            document.getElementById('modalTitle').textContent = '编辑角色';
+            document.getElementById('roleIdInput').value = role.id;
+            document.getElementById('roleIdInput').disabled = true;
+            document.getElementById('roleNameInput').value = role.name;
+            document.getElementById('roleDescInput').value = role.description;
+            document.getElementById('rolePromptInput').value = role.system_prompt;
+            document.getElementById('roleModal').classList.add('show');
+        }
+
+        function hideRoleModal() {
+            document.getElementById('roleModal').classList.remove('show');
+        }
+
+        async function saveRole() {
+            const id = document.getElementById('roleIdInput').value.trim();
+            const name = document.getElementById('roleNameInput').value.trim();
+            const description = document.getElementById('roleDescInput').value.trim();
+            const systemPrompt = document.getElementById('rolePromptInput').value.trim();
+
+            if (!id || !name || !description || !systemPrompt) {
+                alert('请填写所有字段');
+                return;
+            }
+
+            try {
+                const url = editingRoleId ? '/api/admin/role/update' : '/api/admin/role/add';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: adminPassword,
+                        id,
+                        name,
+                        description,
+                        system_prompt: systemPrompt
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    hideRoleModal();
+                    loadRoles();
+                } else {
+                    alert(data.error || '操作失败');
+                }
+            } catch (error) {
+                alert('保存失败，请检查服务器');
+            }
+        }
+
+        async function deleteRole(roleId) {
+            if (!confirm('确定要删除这个角色吗？')) return;
+
+            try {
+                const response = await fetch('/api/admin/role/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: adminPassword,
+                        id: roleId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadRoles();
+                } else {
+                    alert(data.error || '删除失败');
+                }
+            } catch (error) {
+                alert('删除失败，请检查服务器');
+            }
+        }
+
+        // 背景图片管理
+        async function loadBackgrounds() {
+            try {
+                const response = await fetch('/api/backgrounds');
+                const data = await response.json();
+                backgrounds = data.images;
+                renderBackgrounds();
+            } catch (error) {
+                document.getElementById('backgroundsGrid').innerHTML = '<div class="loading" style="color: #ef4444;">加载失败</div>';
+            }
+        }
+
+        function renderBackgrounds() {
+            if (backgrounds.length === 0) {
+                document.getElementById('backgroundsGrid').innerHTML = '<div class="loading">暂无背景图片</div>';
+                return;
+            }
+
+            document.getElementById('backgroundsGrid').innerHTML = backgrounds.map(img => `
+                <div class="bg-card">
+                    <img src="${img}" alt="${img}">
+                    <div class="bg-card-footer">
+                        <p>${img.replace('bg/', '')}</p>
+                        <button onclick="deleteBackground('${img}')">删除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            uploadFile(file);
+        }
+
+        async function uploadFile(file) {
+            const uploadArea = document.getElementById('uploadArea');
+            const progressBar = document.getElementById('progressBar');
+            const uploadProgress = document.getElementById('uploadProgress');
+            const uploadSuccess = document.getElementById('uploadSuccess');
+
+            uploadProgress.classList.add('show');
+            uploadSuccess.textContent = '';
+            progressBar.style.width = '0%';
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('password', adminPassword);
+
+            try {
+                const response = await fetch('/api/admin/background/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                progressBar.style.width = '100%';
+
+                const data = await response.json();
+
+                if (data.success) {
+                    uploadSuccess.textContent = '上传成功！';
+                    setTimeout(() => {
+                        uploadSuccess.textContent = '';
+                        uploadProgress.classList.remove('show');
+                        progressBar.style.width = '0%';
+                    }, 2000);
+                    loadBackgrounds();
+                } else {
+                    alert(data.error || '上传失败');
+                    uploadProgress.classList.remove('show');
+                }
+            } catch (error) {
+                alert('上传失败，请检查服务器');
+                uploadProgress.classList.remove('show');
+            }
+
+            // 重置文件输入
+            document.getElementById('fileInput').value = '';
+        }
+
+        async function deleteBackground(filename) {
+            if (!confirm('确定要删除这个背景图片吗？')) return;
+
+            try {
+                const response = await fetch('/api/admin/background/delete', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: adminPassword,
+                        filename: filename
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadBackgrounds();
+                } else {
+                    alert(data.error || '删除失败');
+                }
+            } catch (error) {
+                alert('删除失败，请检查服务器');
+            }
+        }
+
+        // 系统配置
+        async function loadConfig() {
+            try {
+                const response = await fetch('/api/admin/config');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('apiKeyInput').value = data.config.deepseek_api_key || '';
+                    document.getElementById('modelInput').value = data.config.deepseek_model || '';
+                    document.getElementById('baseUrlInput').value = data.config.deepseek_base_url || '';
+                    document.getElementById('configSuccess').textContent = '配置已加载';
+                    setTimeout(() => { document.getElementById('configSuccess').textContent = ''; }, 2000);
+                }
+            } catch (error) {
+                alert('加载配置失败');
+            }
+        }
+
+        async function saveSystemConfig() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            const model = document.getElementById('modelInput').value.trim();
+            const baseUrl = document.getElementById('baseUrlInput').value.trim();
+
+            try {
+                const response = await fetch('/api/admin/config/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        password: adminPassword,
+                        deepseek_api_key: apiKey,
+                        deepseek_model: model,
+                        deepseek_base_url: baseUrl
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('configSuccess').textContent = '配置已保存，已立即生效';
+                    document.getElementById('apiKeyInput').value = '';
+                } else {
+                    alert(data.error || '保存失败');
+                }
+            } catch (error) {
+                alert('保存失败，请检查服务器');
+            }
+        }
+
+        // 拖拽上传
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                uploadFile(file);
+            }
+        });
+
+        // 点击模态框外部关闭
+        document.getElementById('roleModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideRoleModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>✨SexyChat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <button class="bg-switcher" id="bgSwitcher" title="切换背景">⟳</button>
+            <button class="reset-btn" id="resetBtn" title="重置会话" style="display: none;">↺</button>
+            <h1>✨ Chat</h1>
+            <div class="role-info" id="roleInfo">选择一个角色开始</div>
+        </div>
+
+        <div class="role-selector" id="roleSelector">
+            <div class="role-selector-header" id="roleSelectorHeader">
+                <h3>选择角色</h3>
+                <button class="toggle-btn" id="toggleBtn">▲</button>
+            </div>
+            <div class="role-selector-content">
+                <div class="role-grid" id="roleGrid">
+                    <div class="loading">加载中...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages"></div>
+        
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="请先选择角色..." disabled autocomplete="off">
+            <button id="sendButton" disabled>发送</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="customRoleModal">
+        <div class="modal">
+            <h2>创建专属角色</h2>
+            
+            <div class="form-group">
+                <label for="customRoleName">角色名称</label>
+                <input type="text" id="customRoleName" placeholder="例如：心灵导师">
+            </div>
+            
+            <div class="form-group">
+                <label for="customRoleDesc">角色描述</label>
+                <input type="text" id="customRoleDesc" placeholder="简短描述">
+            </div>
+            
+            <div class="form-group">
+                <label for="customSystemPrompt">角色定义</label>
+                <textarea id="customSystemPrompt" placeholder="详细描述这个角色的身份和性格..."></textarea>
+                <div class="hint">系统提示词将引导AI以特定角色身份对话</div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btnCancelModal">取消</button>
+                <button class="btn-confirm" id="createCustomRoleBtn" disabled>创建</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
